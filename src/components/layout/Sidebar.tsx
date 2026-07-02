@@ -3,55 +3,68 @@ import { Users, CreditCard, DoorOpen, BookOpen, LayoutDashboard, LogOut } from '
 import { useAuth } from '../../hooks/useAuth'
 
 const nav = [
-  { to: '/',            icon: LayoutDashboard, label: 'Dashboard'    },
-  { to: '/estudiantes', icon: Users,           label: 'Estudiantes'  },
-  { to: '/planes',      icon: BookOpen,        label: 'Planes'       },
-  { to: '/pagos',       icon: CreditCard,      label: 'Pagos'        },
-  { to: '/accesos',     icon: DoorOpen,        label: 'Accesos'      },
+  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/estudiantes', icon: Users, label: 'Estudiantes' },
+  { to: '/planes', icon: BookOpen, label: 'Planes' },
+  { to: '/pagos', icon: CreditCard, label: 'Pagos' },
+  { to: '/accesos', icon: DoorOpen, label: 'Accesos' },
 ]
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { signOut, user } = useAuth()
 
   return (
-    <aside className="w-56 bg-surface-800 border-r border-surface-200/10 flex flex-col h-screen sticky top-0">
+    <aside className={`
+      fixed inset-y-0 left-0 z-40 flex flex-col w-56 shrink-0 border-r bg-cosmos-900 border-white/8
+      transition-transform duration-200 ease-in-out
+      ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:z-auto
+    `}>
+
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-surface-200/10">
-        <span className="font-display text-3xl text-brand-500 tracking-widest">ACCESO</span>
-        <p className="text-surface-200/40 font-mono text-[10px] mt-0.5 uppercase tracking-widest">
-          Academia de Baile
-        </p>
+      <div className="border-b border-white/8">
+        <div className="flex items-center justify-center">
+          <img src="/logo_light.png" alt="Universe Academy" className="object-contain w-full h-auto" />
+        </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-2 py-4 space-y-0.5">
         {nav.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
             end={to === '/'}
+            onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-body transition-colors duration-150 ${
-                isActive
-                  ? 'bg-brand-500/15 text-brand-500'
-                  : 'text-surface-200/60 hover:text-surface-50 hover:bg-surface-700'
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body transition-all duration-150 ${isActive ? 'nav-active' : 'nav-idle'
               }`
             }
           >
-            <Icon size={16} />
+            <Icon size={15} />
             {label}
           </NavLink>
         ))}
       </nav>
 
+      {/* Gradiente decorativo */}
+      <div className="h-px mx-4 mb-4 bg-gradient-to-r from-transparent via-universe-600/40 to-transparent" />
+
       {/* Usuario */}
-      <div className="px-4 py-4 border-t border-surface-200/10">
-        <p className="text-surface-200/40 font-mono text-[10px] truncate mb-2">{user?.email}</p>
+      <div className="px-4 pb-5">
+        <p className="text-white/30 font-mono text-[9px] truncate mb-2 uppercase tracking-widest">
+          {user?.email}
+        </p>
         <button
           onClick={signOut}
-          className="flex items-center gap-2 text-surface-200/50 hover:text-brand-500 text-xs font-mono transition-colors"
+          className="flex items-center gap-2 font-mono text-xs transition-colors text-white/30 hover:text-red-400"
         >
-          <LogOut size={13} /> Cerrar sesión
+          <LogOut size={12} /> Cerrar sesión
         </button>
       </div>
     </aside>

@@ -42,14 +42,14 @@ export default function Accesos() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="font-display text-4xl tracking-widest">ACCESOS</h2>
+        <h2 className="font-display text-3xl font-bold tracking-widest">ACCESOS</h2>
         <p className="text-surface-200/40 font-mono text-xs mt-1">Log en tiempo real — últimos 100 registros</p>
       </div>
 
       {loading ? (
         <p className="text-surface-200/40 font-mono text-sm">Cargando...</p>
       ) : (
-        <div className="card p-0 overflow-hidden">
+        <div className="card p-0 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-surface-200/10 text-surface-200/40 font-mono text-xs uppercase tracking-wider">

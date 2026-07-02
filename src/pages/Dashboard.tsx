@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { getLocalDate } from '../lib/date'
+import type { Database } from '../types/database'
 import { Users, CheckCircle, XCircle, DoorOpen } from 'lucide-react'
 
 interface Stats {
@@ -16,11 +18,11 @@ export default function Dashboard() {
   useEffect(() => {
     async function load() {
       const [{ count: total }, { data: pagos }, { count: accesosHoy }] = await Promise.all([
-        supabase.from('estudiantes').select('*', { count: 'exact', head: true }).eq('activo', true),
-        supabase.from('v_estado_pago_actual').select('acceso_permitido'),
-        supabase.from('accesos')
+        supabase.from<'estudiantes', Database['public']['Tables']['estudiantes']>('estudiantes').select('*', { count: 'exact', head: true }).eq('activo', true),
+        supabase.from<'v_estado_pago_actual', Database['public']['Views']['v_estado_pago_actual']>('v_estado_pago_actual').select('acceso_permitido'),
+        supabase.from<'accesos', Database['public']['Tables']['accesos']>('accesos')
           .select('*', { count: 'exact', head: true })
-          .gte('capturado_en', new Date().toISOString().split('T')[0]),
+          .gte('capturado_en', getLocalDate()),
       ])
 
       const alDia = pagos?.filter(p => p.acceso_permitido).length ?? 0
@@ -38,15 +40,15 @@ export default function Dashboard() {
   }, [])
 
   const cards = [
-    { label: 'Alumnos activos',   value: stats.totalAlumnos,    icon: Users,       color: 'text-sky-400'     },
-    { label: 'Al corriente',      value: stats.alumnosAlDia,    icon: CheckCircle, color: 'text-emerald-400' },
-    { label: 'Con adeudo',        value: stats.alumnosAtrasados,icon: XCircle,     color: 'text-brand-500'   },
-    { label: 'Accesos hoy',       value: stats.accesosHoy,      icon: DoorOpen,    color: 'text-amber-400'   },
+    { label: 'Alumnos activos', value: stats.totalAlumnos, icon: Users, color: 'text-sky-400' },
+    { label: 'Al corriente', value: stats.alumnosAlDia, icon: CheckCircle, color: 'text-emerald-400' },
+    { label: 'Con adeudo', value: stats.alumnosAtrasados, icon: XCircle, color: 'text-brand-500' },
+    { label: 'Accesos hoy', value: stats.accesosHoy, icon: DoorOpen, color: 'text-amber-400' },
   ]
 
   return (
     <div>
-      <h2 className="font-display text-4xl tracking-widest mb-1">DASHBOARD</h2>
+      <h2 className="font-display text-3xl font-bold tracking-widest mb-1">DASHBOARD</h2>
       <p className="text-surface-200/40 font-mono text-xs mb-8">
         {new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
       </p>
@@ -56,7 +58,7 @@ export default function Dashboard() {
           <div key={label} className="card flex flex-col gap-3">
             <Icon size={20} className={color} />
             <div>
-              <p className={`font-display text-4xl tracking-wider ${loading ? 'opacity-30' : ''}`}>
+              <p className={`font-display text-4xl font-bold tracking-wider ${loading ? 'opacity-30' : ''}`}>
                 {loading ? '—' : value}
               </p>
               <p className="text-surface-200/50 font-mono text-xs mt-1">{label}</p>
